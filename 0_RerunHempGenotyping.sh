@@ -62,18 +62,16 @@ conda activate $conda_hemp
 ##############
 
 # bcftools view 1b_hemp.snp_calls.bcf --output-type z > 1b_hemp.snp_calls.vcf.gz
+# 
+# # Get reports
+# $TASSEL5 -SortGenotypeFilePlugin -inputFile 1b_hemp.snp_calls.vcf.gz -outputFile 1b_hemp.snp_calls.sorted.vcf.gz
+# $TASSEL5 -vcf 1b_hemp.snp_calls.sorted.vcf.gz -genotypeSummary site -export $filtdir/1c_sitesummary.txt
+# $TASSEL5 -vcf 1b_hemp.snp_calls.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1c_taxasummary.txt
+# vcftools --gzvcf 1b_hemp.snp_calls.sorted.vcf.gz  --site-depth --stdout > $filtdir/1c_site_depth.txt
 
-# Get reports
-$TASSEL5 -SortGenotypeFilePlugin -inputFile 1b_hemp.snp_calls.vcf.gz -outputFile 1b_hemp.snp_calls.sorted.vcf.gz
-$TASSEL5 -vcf 1b_hemp.snp_calls.sorted.vcf.gz -genotypeSummary site -export $filtdir/1c_sitesummary.txt
-$TASSEL5 -vcf 1b_hemp.snp_calls.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1c_taxasummary.txt
-vcftools --gzvcf 1b_hemp.snp_calls.sorted.vcf.gz  --site-depth --stdout > $filtdir/1c_site_depth.txt
-vcftools --gzvcf 1b_hemp.snp_calls.sorted.vcf.gz  --geno-depth --stdout | tail -n +2 | cut -f 3- | sed -r -e "s|\t0||g" -e "s|^0\t||" | gzip > $filtdir/1c_geno_depth.txt.gz # Cut down to just needed, non-zero numbers
-
-
-# # Plot diagnostic plots from the above summary data
-# Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1c_sitesummary.txt --taxafile $filtdir/1c_taxasummary.txt --depthfile $filtdir/1c_site_depth.txt \
-#    --genodepth $filtdir/1c_geno_depth.txt.gz --max-datapoints 10000 -o $filtdir/1c_summary_plots.png
+# # Plot diagnostic plots from the above summary data - TODO: Add depth binplot to identify sweet spot
+Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1c_sitesummary.txt --taxafile $filtdir/1c_taxasummary.txt --depthfile $filtdir/1c_site_depth.txt \
+    --max-datapoints 10000 -o $filtdir/1c_summary_plots.png
 
 # # Basic site and individual filtering
 # site_max_depth=500
@@ -92,11 +90,10 @@ vcftools --gzvcf 1b_hemp.snp_calls.sorted.vcf.gz  --geno-depth --stdout | tail -
 # $TASSEL5 -vcf 1e_hemp_filtered.sorted.vcf.gz -genotypeSummary site -export $filtdir/1e_sitesummary.postfilter.txt
 # $TASSEL5 -vcf 1e_hemp_filtered.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1e_taxasummary.postfilter.txt
 # vcftools --gzvcf 1e_hemp_filtered.sorted.vcf.gz  --site-depth --stdout > $filtdir/1e_site_depth.postfilter.txt
-# vcftools --gzvcf 1e_hemp_filtered.sorted.vcf.gz  --geno-depth --stdout | tail -n +2 | cut -f 3- | sed -r -e "s|\t0||g" -e "s|^0\t||" | gzip > $filtdir/1e_geno_depth.postfilter.txt.gz # Cut down to just needed, non-zero numbers
 
 # # Plot 
 # Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1e_sitesummary.postfilter.txt --taxafile $filtdir/1e_taxasummary.postfilter.txt --depthfile $filtdir/1e_site_depth.postfilter.txt \
-#    --genodepth $filtdir/1e_geno_depth.postfilter.txt.gz --max-datapoints 10000 -o 1e_hemp_filtered.summary_plots.png
+#    --max-datapoints 10000 -o 1e_hemp_filtered.summary_plots.png
 
 
 
