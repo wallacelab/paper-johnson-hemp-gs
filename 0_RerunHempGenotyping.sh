@@ -69,9 +69,9 @@ conda activate $conda_hemp
 # $TASSEL5 -vcf 1b_hemp.snp_calls.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1c_taxasummary.txt
 # vcftools --gzvcf 1b_hemp.snp_calls.sorted.vcf.gz  --site-depth --stdout > $filtdir/1c_site_depth.txt
 
-# # Plot diagnostic plots from the above summary data - TODO: Add depth binplot to identify sweet spot
-Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1c_sitesummary.txt --taxafile $filtdir/1c_taxasummary.txt --depthfile $filtdir/1c_site_depth.txt \
-    --max-datapoints 10000 -o $filtdir/1c_summary_plots.png
+# # Plot diagnostic plots from the above summary data
+# Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1c_sitesummary.txt --taxafile $filtdir/1c_taxasummary.txt --depthfile $filtdir/1c_site_depth.txt \
+#     --max-datapoints 10000 -o $filtdir/1c_summary_plots.png
 
 # # Basic site and individual filtering
 # site_max_depth=500
