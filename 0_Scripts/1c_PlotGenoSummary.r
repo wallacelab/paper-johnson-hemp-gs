@@ -14,14 +14,16 @@ parser$add_argument("-s", "--sitefile", help="TASSEL genotype summary file of si
 parser$add_argument("-t", "--taxafile", help="TASSEL genotype summary file of taxa")
 parser$add_argument("-d", "--depthfile", help="VCFTools depth output file")
 parser$add_argument("-g", "--genodepth", help="VCFTools output of genotype depth")
-parser$add_argument("-r", "--readdepth", help="LGC genomics file of sample read depths")  # Not used anymore
+parser$add_argument("-r", "--restriction-frags", help="File with lengths of restriction fragments")
 parser$add_argument("-o", "--outfile", help="Output graphic")
 parser$add_argument("-m", "--max-datapoints", type="integer", help="Randomly subset to this many datapoints if dataset has more")
+parser$add_argument("--min-fragsize", type="integer", default=50, help="Randomly subset to this many datapoints if dataset has more")
+parser$add_argument("--max-fragsize", type="integer", default=500, help="Randomly subset to this many datapoints if dataset has more")
 args=parser$parse_args()
 # setwd('/home/jgwall/Projects/Hemp/HempAnalysis_JasonRedo/1a_filtering/')
 # args=parser$parse_args(c("-s","1c_sitesummary.txt", "-t", "1c_taxasummary.txt",
 #                          "-d", "1c_site_depth.txt", "-g", "1c_geno_depth.txt.gz",
-#                          "-r", "../0_sample_read_counts.tsv", "-o", "99_tmp.png"))
+#                          "-r", "1c_restriction_frag_lengths.txt", "-o", "99_tmp.png"))
 
 
 plots = list()
@@ -168,6 +170,37 @@ if(!is.null(args$sitefile)){
     cat("Unable to create site summary plot because missing input file\n")
 }
 
+
+
+###
+# Expected size/count of fragments
+###
+
+
+if(!is.null(args$restriction_frags)){
+    cat("Plotting expected restriction fragment length based on sizes in",args$restriction_frags,"\n") 
+    frags = scan(args$restriction_frags)
+    
+    num_captured = sum(frags >= args$min_fragsize & frags <= args$max_fragsize)
+    highlight = data.frame(xmin=args$min_fragsize, xmax=args$max_fragsize, ymin=-Inf, ymax=Inf)
+    
+    fragplot = qplot(x=log10(frags), geom='histogram') +
+            labs(title="Restriction fragment distribution", x="Log10 fragment size", y="Count") +
+            geom_rect(highlight, mapping=aes(xmin=log10(xmin), xmax=log10(xmax), ymin=ymin, ymax=ymax, 
+                                             fill='captured'), inherit.aes=F, alpha=0.25) +
+            labs(subtitle=paste("Predicted",num_captured,"fragments captured of",sum(frags),"bp")) +
+            labs(fill=paste("Size of ", args$min_fragsize, "-", args$max_fragsize, "bp", sep="")) +
+            theme(legend.position = c(0.8, 0.8))
+    
+    
+    plots = c(plots, list(fragplot))
+}else{
+    cat("Unable to create graph of expected restriction fragments because missing length file\n")
+}
+
+
+
+
 ###
 # Binplot/heatmap of mean depth vs % present; arguably most informative
 ###
@@ -186,14 +219,17 @@ if(!is.null(args$depthfile) && !is.null(args$sitefile)){
     bindepth = ggplot(depthstats, mapping=aes(x=log10(mean_depth), y=fraction_present)) +
         geom_bin2d() +
         scale_fill_gradient(low='blue', high='red') +
-        labs(title = "Geno Calls - Read Depth vs Presence", x="log10(Mean Depth)", y="Fraction Samples Present")
+        labs(title = "Geno Calls - Read Depth vs Presence", x="log10(Mean Depth)", y="Fraction Samples Present") +
+        ylim(-0.05, 1.05)
+    
 
     # Binplot - Only things with at least 1 mean depth
     substats = subset(depthstats, depthstats$mean_depth >= 1)
     bindepth_cutoff = ggplot(substats, mapping=aes(x=log10(mean_depth), y=fraction_present)) +
         geom_bin2d() +
         scale_fill_gradient(low='blue', high='red') +
-        labs(title = "Geno Calls - Read Depth vs Presence", subtitle="(Mean read >=1)", x="log10(Mean Depth)", y="Fraction Samples Present")
+        labs(title = "Geno Calls - Read Depth vs Presence", subtitle="(Mean read >=1)", x="log10(Mean Depth)", y="Fraction Samples Present") +
+        ylim(-0.05, 1.05)
 
     plots = c(plots, list(bindepth, bindepth_cutoff))
 }else{

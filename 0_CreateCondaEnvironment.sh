@@ -53,9 +53,12 @@ conda create --name $conda_env --file conda_environment.txt
 # These are the commands originally used to create the above environment (and export it to conda_environment.txt).
 # You should not need to run these commands, but they are included to document what was done.
 
-# # Create environment
+# # Create environment; scipy added later, hence in another command
 # conda create -n $conda_env bcftools=1.9 vcftools=0.1.16 tassel=5.2.40 r-base=3.6.2 r-essentials=3.6
-# 
+# conda activate $conda_env
+# conda install scipy
+
+
 # # Export environment for others to load
 # conda list --explicit > conda_environment.txt
 

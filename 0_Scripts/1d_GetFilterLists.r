@@ -13,6 +13,8 @@ parser$add_argument("-t", "--taxafile", help="TASSEL genotype summary file of ta
 parser$add_argument("-d", "--depthfile", help="VCFTools depth output file")
 parser$add_argument("--site-min-depth", type="integer", default=0, help="Minimum total depth to keep a site")
 parser$add_argument("--site-max-depth", type="integer", default=9999999, help="Maximum total depth to keep a site")
+parser$add_argument("--site-min-mean-depth", type="integer", default=0, help="Minimum mean depth to keep a site")
+parser$add_argument("--site-max-mean-depth", type="integer", default=9999999, help="Maximum mean depth to keep a site")
 parser$add_argument("--site-min-het", type="double", default=0, help="Minimum fraction het to keep a site")
 parser$add_argument("--site-max-het", type="double", default=1, help="Maximum fraction het to keep a site")
 parser$add_argument("--site-min-maf", type="double", default=0, help="Minimum minor allele frequency to keep a site")
@@ -23,10 +25,10 @@ parser$add_argument("--outtaxa", help="Output file of taxa to keep")
 parser$add_argument("--outsites", help="Output file of sites to keep (coordinates)")
 parser$add_argument("--outsitenames", help="Output file of sites to keep (names)")
 args=parser$parse_args()
-# setwd('/home/jgwall/Projects/PearlMillet/BoubacarPearlMilletPops/GenomeLinkageMaps/2_Analysis/')
-# args=parser$parse_args(c("-s","2a_sitesummary.txt", "-t", "2a_taxasummary.txt", "-d", "2a_depth.txt",
-#                          "--outtaxa", "99_tmp.taxa.txt", "--outsite", "99_tmp.site.txt",
-#                          "--site-max-depth", "1000", "--site-max-het", "0.25", "--site-min-maf", "0.2",
+# setwd('/home/jgwall/Projects/Hemp/HempAnalysis_JasonRedo/1a_filtering/')
+# args=parser$parse_args(c("-s","1c_sitesummary.txt", "-t", "1c_taxasummary.txt", "-d", "1c_site_depth.txt",
+#                          "--outtaxa", "99_tmp.taxa.txt", "--outsites", "99_tmp.site.txt", "--site-min-mean-depth", "15",
+#                          "--site-max-mean-depth", "150", "--site-max-het", "0.25", "--site-min-maf", "0.2",
 #                          "--taxa-max-missing", "0.9", "--site-max-missing", "0.6"))
 
 
@@ -34,6 +36,7 @@ args=parser$parse_args()
 depths = read.delim(args$depthfile, check.names=F)
 sites = read.delim(args$sitefile, check.names=F)
 taxa = read.delim(args$taxafile, check.names=F)
+depths$mean_depth = depths$SUM_DEPTH / sites$'Number of Taxa'
 
 #### 
 # Filter sites
@@ -46,7 +49,11 @@ cat("Compiling site filters on", nrow(sites), "sites\n")
 #     stop("Depth info and site info names do not match\n")
 # }
 good_depth = depths$SUM_DEPTH >= args$site_min_depth & depths$SUM_DEPTH <= args$site_max_depth
-cat("\t",sum(good_depth, na.rm=T),"sites pass depth filter of [", args$site_min_depth, ",", args$site_max_depth, "]\n")
+cat("\t",sum(good_depth, na.rm=T),"sites pass total depth filter of [", args$site_min_depth, ",", args$site_max_depth, "]\n")
+
+# Mean depth
+good_meandepth = depths$mean_depth >= args$site_min_mean_depth & depths$mean_depth <= args$site_max_mean_depth
+cat("\t",sum(good_meandepth, na.rm=T),"sites pass mean depth filter of [", args$site_min_mean_depth, ",", args$site_max_mean_depth, "]\n")
 
 # Het
 good_het = sites$`Proportion Heterozygous` >= args$site_min_het & sites$`Proportion Heterozygous` <= args$site_max_het
@@ -61,7 +68,7 @@ good_missing = sites$`Proportion Missing` <= args$site_max_missing
 cat("\t",sum(good_missing, na.rm=T),"sites pass missingness filter of [ 0 , ", args$site_max_missing, "]\n")
 
 # Combine
-good_sites = good_depth & good_het & good_maf & good_missing
+good_sites = good_depth & good_meandepth & good_het & good_maf & good_missing
 cat("\t",sum(good_sites),"sites are left after combining all filters\n")
 
 # Output
