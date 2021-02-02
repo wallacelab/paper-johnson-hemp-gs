@@ -95,62 +95,51 @@ conda activate $conda_hemp
 # bcftools view --targets-file $filtdir/1d_sites_to_keep.txt --samples-file $filtdir/1d_taxa_to_keep.txt --output-type z --output-file $filtdir/1e_hemp_filter1.vcf.gz 1b_hemp.snp_calls.bcf 
 
 
-################
-# Check (and correct) het calls
-################
 
-# # Heterozygous calls are a minor part of the genotypes, but I want to do a quick check to make sure they're reasonable.
-# # Note: This code as written removes tertiary allele states. They affect some genotypes, but not many
-# echo -e "call\tref\talt" > $filtdir/1f_check_het_calls.txt
-# zcat $filtdir/1e_hemp_filter1.vcf.gz | grep -v "^#" | cut -f10- | tr '\t' '\n' | tr ":" "\t", | cut -f1-2 | grep -e "0/1" -e "1/0" | tr ',' '\t' | cut -f1-3 >> $filtdir/1f_check_het_calls.txt
-# Rscript $scriptdir/1f_CheckHetCalls.r -i $filtdir/1f_check_het_calls.txt -o $filtdir/1f_check_het_calls.png --log-scale
-
-# Okay, definitely looks like the genotype caller is being too generous with het calls, probably b/c it assumes Hardy-Weinberg Equilibrium. Recall hets (and only hets) based on binomial probabilities
-# python3 $scriptdir/1g_CorrectHetsInVcf.py -i $filtdir/1e_hemp_filter1.vcf.gz --p-cutoff 0.01 -o $filtdir/1g_hemp_filter1.fix_hets.vcf.gz #--debug
-
-
+# Below for backup purposes
 ##############
 # Final Filtering - Allele frequency and heterozygosity
 ##############
 
 
+
 # # Run post-filter diagnostic plots (really should make this step its own function or subscript or something)
-# $TASSEL5 -SortGenotypeFilePlugin -inputFile $filtdir/1g_hemp_filter1.fix_hets.vcf.gz -outputFile $filtdir/1g_hemp_filter1.fix_hets.sorted.vcf.gz
-# $TASSEL5 -vcf $filtdir/1g_hemp_filter1.fix_hets.sorted.vcf.gz -genotypeSummary site -export $filtdir/1h_sitesummary.filter1.txt
-# $TASSEL5 -vcf $filtdir/1g_hemp_filter1.fix_hets.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1h_taxasummary.filter1.txt
-# vcftools --gzvcf $filtdir/1g_hemp_filter1.fix_hets.sorted.vcf.gz  --site-depth --stdout > $filtdir/1h_site_depth.filter1.txt
+# $TASSEL5 -SortGenotypeFilePlugin -inputFile $filtdir/1e_hemp_filter1.vcf.gz -outputFile $filtdir/1e_hemp_filter1.sorted.vcf.gz
+# $TASSEL5 -vcf $filtdir/1e_hemp_filter1.sorted.vcf.gz -genotypeSummary site -export $filtdir/1e_sitesummary.filter1.txt
+# $TASSEL5 -vcf $filtdir/1e_hemp_filter1.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1e_taxasummary.filter1.txt
+# vcftools --gzvcf $filtdir/1e_hemp_filter1.sorted.vcf.gz  --site-depth --stdout > $filtdir/1e_site_depth.filter1.txt
 # 
 # # Plot 
-# Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1h_sitesummary.filter1.txt --taxafile $filtdir/1h_taxasummary.filter1.txt --depthfile $filtdir/1h_site_depth.filter1.txt \
-#    --restriction-frags $filtdir/1c_restriction_frag_lengths.txt --max-datapoints 10000 -o $filtdir/1h_hemp_filter1.summary_plots.png
-
-
-    
-# # Second round of filtering
+# Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1e_sitesummary.filter1.txt --taxafile $filtdir/1e_taxasummary.filter1.txt --depthfile $filtdir/1e_site_depth.filter1.txt \
+#    --restriction-frags $filtdir/1c_restriction_frag_lengths.txt --max-datapoints 10000 -o $filtdir/1e_hemp_filter1.summary_plots.png
+# 
+# 
+#     
+# # # Second round of filtering
 # site_max_het=0.1
 # site_min_maf=0.025
-# Rscript $scriptdir/1d_GetFilterLists.r --sitefile $filtdir/1h_sitesummary.filter1.txt --taxafile $filtdir/1h_taxasummary.filter1.txt --depthfile $filtdir/1h_site_depth.filter1.txt \
+# Rscript $scriptdir/1d_GetFilterLists.r --sitefile $filtdir/1e_sitesummary.filter1.txt --taxafile $filtdir/1e_taxasummary.filter1.txt --depthfile $filtdir/1e_site_depth.filter1.txt \
 #     --site-max-het $site_max_het --site-min-maf $site_min_maf \
-#     --outtaxa $filtdir/1i_taxa_to_keep.filt2.txt --outsites $filtdir/1i_sites_to_keep.filt2.txt
-
+#     --outtaxa $filtdir/1f_taxa_to_keep.filt2.txt --outsites $filtdir/1f_sites_to_keep.filt2.txt
+# 
 # # Perform actual filtering
-# bcftools view --targets-file $filtdir/1i_sites_to_keep.filt2.txt --samples-file $filtdir/1i_taxa_to_keep.filt2.txt --output-type z --output-file $filtdir/1j_hemp_filter2.vcf.gz $filtdir/1g_hemp_filter1.fix_hets.vcf.gz
-
-
+# bcftools view --targets-file $filtdir/1f_sites_to_keep.filt2.txt --samples-file $filtdir/1f_taxa_to_keep.filt2.txt --output-type z --output-file $filtdir/1g_hemp_filter2.vcf.gz $filtdir/1e_hemp_filter1.vcf.gz
+# 
+# 
 # # # Final post-filter diagnostic plots (mostly as a sanity check)
-# $TASSEL5 -SortGenotypeFilePlugin -inputFile $filtdir/1j_hemp_filter2.vcf.gz -outputFile $filtdir/1j_hemp_filter2.sorted.vcf.gz
-# $TASSEL5 -vcf $filtdir/1j_hemp_filter2.sorted.vcf.gz -genotypeSummary site -export $filtdir/1j_sitesummary.filter2.txt
-# $TASSEL5 -vcf $filtdir/1j_hemp_filter2.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1j_taxasummary.filter2.txt
-# vcftools --gzvcf $filtdir/1j_hemp_filter2.sorted.vcf.gz  --site-depth --stdout > $filtdir/1j_site_depth.filter2.txt
+# $TASSEL5 -SortGenotypeFilePlugin -inputFile $filtdir/1g_hemp_filter2.vcf.gz -outputFile $filtdir/1g_hemp_filter2.sorted.vcf.gz
+# $TASSEL5 -vcf $filtdir/1g_hemp_filter2.sorted.vcf.gz -genotypeSummary site -export $filtdir/1g_sitesummary.filter2.txt
+# $TASSEL5 -vcf $filtdir/1g_hemp_filter2.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1g_taxasummary.filter2.txt
+# vcftools --gzvcf $filtdir/1g_hemp_filter2.sorted.vcf.gz  --site-depth --stdout > $filtdir/1g_site_depth.filter2.txt
 # 
 # # Plot 
-# Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1j_sitesummary.filter2.txt --taxafile $filtdir/1j_taxasummary.filter2.txt --depthfile $filtdir/1j_site_depth.filter2.txt \
-#     --restriction-frags $filtdir/1c_restriction_frag_lengths.txt --max-datapoints 10000 -o $filtdir/1j_hemp_filter2.summary_plots.png
+# Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1g_sitesummary.filter2.txt --taxafile $filtdir/1g_taxasummary.filter2.txt --depthfile $filtdir/1g_site_depth.filter2.txt \
+#     --restriction-frags $filtdir/1c_restriction_frag_lengths.txt --max-datapoints 10000 -o $filtdir/1g_hemp_filter2.summary_plots.png
+# 
+# 
+# # Copy filtered genotypes back to main directory
+# cp $filtdir/1g_hemp_filter2.sorted.vcf.gz ./1g_hemp_filtered.sorted.vcf.gz
 
-
-
-# Copy filtered genotypes back to main directory
-cp $filtdir/1j_hemp_filter2.sorted.vcf.gz ./1g_hemp_filtered.sorted.vcf.gz
 
 
 
@@ -158,16 +147,16 @@ cp $filtdir/1j_hemp_filter2.sorted.vcf.gz ./1g_hemp_filtered.sorted.vcf.gz
 # Phylogenetic tree
 ##############
 
-# # Tree
-# $TASSEL5 -vcf 1g_hemp_filtered.sorted.vcf.gz -tree Neighbor -treeSaveDistance false -export 1g_hemp_filtered.sorted.tre -exportType Text
-# mv 1g_hemp_filtered.sorted.tre.txt 1g_hemp_filtered.sorted.tre
+# Tree
+$TASSEL5 -vcf 1g_hemp_filtered.sorted.vcf.gz -tree Neighbor -treeSaveDistance false -export 1g_hemp_filtered.sorted.tre -exportType Text
+mv 1g_hemp_filtered.sorted.tre.txt 1g_hemp_filtered.sorted.tre
 
 
 ##############
 # Genomic prediction
 ##############
 
-# # Rename samples to match phenotype info (Tried with 'bcftools reheader', but it did the compression wrong somehow)
+# Rename samples to match phenotype info (Tried with 'bcftools reheader', but it did the compression wrong somehow)
 source=1g_hemp_filtered.sorted.vcf.gz
 newfile=1h_hemp_filtered.sorted.renamed.vcf
 zcat $source | grep "^##" > $newfile   # Metadata lines
@@ -188,49 +177,3 @@ Rscript $scriptdir/1k_PlotPredictionAccuracy.r -i 1j_gs_results.txt -o 1k_gs_res
 # Not great, unfortunately
 
 
-
-# Below for backup purposes
-# # # # # # ##############
-# # # # # # # Final Filtering - Allele frequency and heterozygosity
-# # # # # # ##############
-# # # # # # 
-# # # # # # 
-# # # # # # 
-# # # # # # 
-# # # # # # # # Run post-filter diagnostic plots (really should make this step its own function or subscript or something)
-# # # # # # # $TASSEL5 -SortGenotypeFilePlugin -inputFile $filtdir/1e_hemp_filter1.vcf.gz -outputFile $filtdir/1e_hemp_filter1.sorted.vcf.gz
-# # # # # # # $TASSEL5 -vcf $filtdir/1e_hemp_filter1.sorted.vcf.gz -genotypeSummary site -export $filtdir/1e_sitesummary.filter1.txt
-# # # # # # # $TASSEL5 -vcf $filtdir/1e_hemp_filter1.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1e_taxasummary.filter1.txt
-# # # # # # # vcftools --gzvcf $filtdir/1e_hemp_filter1.sorted.vcf.gz  --site-depth --stdout > $filtdir/1e_site_depth.filter1.txt
-# # # # # # 
-# # # # # # # # Plot 
-# # # # # # # Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1e_sitesummary.filter1.txt --taxafile $filtdir/1e_taxasummary.filter1.txt --depthfile $filtdir/1e_site_depth.filter1.txt \
-# # # # # # #    --restriction-frags $filtdir/1c_restriction_frag_lengths.txt --max-datapoints 10000 -o $filtdir/1e_hemp_filter1.summary_plots.png
-# # # # # # 
-# # # # # # 
-# # # # # #     
-# # # # # # # # # Second round of filtering
-# # # # # # # site_max_het=0.1
-# # # # # # # site_min_maf=0.025
-# # # # # # # Rscript $scriptdir/1d_GetFilterLists.r --sitefile $filtdir/1e_sitesummary.filter1.txt --taxafile $filtdir/1e_taxasummary.filter1.txt --depthfile $filtdir/1e_site_depth.filter1.txt \
-# # # # # # #     --site-max-het $site_max_het --site-min-maf $site_min_maf \
-# # # # # # #     --outtaxa $filtdir/1f_taxa_to_keep.filt2.txt --outsites $filtdir/1f_sites_to_keep.filt2.txt
-# # # # # # # 
-# # # # # # # # Perform actual filtering
-# # # # # # # bcftools view --targets-file $filtdir/1f_sites_to_keep.filt2.txt --samples-file $filtdir/1f_taxa_to_keep.filt2.txt --output-type z --output-file $filtdir/1g_hemp_filter2.vcf.gz $filtdir/1e_hemp_filter1.vcf.gz
-# # # # # # 
-# # # # # # 
-# # # # # # # # # Final post-filter diagnostic plots (mostly as a sanity check)
-# # # # # # # $TASSEL5 -SortGenotypeFilePlugin -inputFile $filtdir/1g_hemp_filter2.vcf.gz -outputFile $filtdir/1g_hemp_filter2.sorted.vcf.gz
-# # # # # # # $TASSEL5 -vcf $filtdir/1g_hemp_filter2.sorted.vcf.gz -genotypeSummary site -export $filtdir/1g_sitesummary.filter2.txt
-# # # # # # # $TASSEL5 -vcf $filtdir/1g_hemp_filter2.sorted.vcf.gz -genotypeSummary taxa -export $filtdir/1g_taxasummary.filter2.txt
-# # # # # # # vcftools --gzvcf $filtdir/1g_hemp_filter2.sorted.vcf.gz  --site-depth --stdout > $filtdir/1g_site_depth.filter2.txt
-# # # # # # 
-# # # # # # # # Plot 
-# # # # # # # Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile $filtdir/1g_sitesummary.filter2.txt --taxafile $filtdir/1g_taxasummary.filter2.txt --depthfile $filtdir/1g_site_depth.filter2.txt \
-# # # # # # #     --restriction-frags $filtdir/1c_restriction_frag_lengths.txt --max-datapoints 10000 -o $filtdir/1g_hemp_filter2.summary_plots.png
-# # # # # # 
-# # # # # # 
-# # # # # # 
-# # # # # # # Copy filtered genotypes back to main directory
-# # # # # # # cp $filtdir/1g_hemp_filter2.sorted.vcf.gz ./1g_hemp_filtered.sorted.vcf.gz
