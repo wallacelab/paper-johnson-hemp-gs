@@ -2,12 +2,7 @@
 
 # Rerunning the hemp genotyping pipeline because first run filtered out PCR duplicates, which is all GBS is
 
-# At that depth, het calls from sequencing errors will be common. Need to find the best way to call those. Can GATK do this well?
-#    I wonder if I'll need to code my own het caller. Graph % minor allele for all het calls
-
-# TODO FIRST: Check het calls to see what fraction of minor allele needed to make a call (when depth is high?)  -> Seem okay. Average around 50%, min call of each of 3. May be more aggressive.
-
-# TODO: Correct het calls based on simple probabilities of allele depths, not HWE ?  -> See how they come out, then correct if need be
+# BWA alignment step maintained from initial analysis; those commands kept in 0_bwa_commands.sh
 
 TASSEL5="run_pipeline.pl -Xms10g -Xmx40g"
 bam_dir="/media/jgwall/Seagate Expansion Drive/Hemp_diversity_GS/Hemp_variant_calling/Bams/"
