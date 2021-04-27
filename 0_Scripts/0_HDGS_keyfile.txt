@@ -1,0 +1,174 @@
+sample	Populations
+1	KauXXX
+10	Berry Blossom
+100	Wife
+101	Cherry_wu
+102	BaoxSP_07
+104	Otto_II
+105	KauXX
+11	Baox
+12	Chardonnay
+13	Cherry_wu
+14	Otto_II
+15	Abacus_Early_Bird_2
+16	Otto
+18	BHWH_Chinese_Fiber_Hemp
+19	Oregon Melon
+2	KauXX
+20	GF_BHWH
+21	C4
+22	C4xBB1
+24	Cherry Wine
+25	AbacusxBB1
+26	LifterSP_01
+28	GF_BHWH
+29	Abacus_Early_Bird
+3	Cherry_original
+30	BHWH_For_Fiber
+31	BaoxSP_07
+32	C4
+33	Otto
+34	Cherry_original
+35	Abacus_Early_Bird_2
+36	Otto_II
+37	KauXXX
+39	Cherry Wine
+4	Wife
+40	Oregon Melon
+41	C4xBB1
+42	Chardonnay
+43	Cherry_wu
+44	Baox
+45	KauXX
+46	BHWH_Chinese_Fiber_Hemp
+47	Wife
+48	Berry Blossom
+49	C4
+5	Abacus_Early_Bird
+50	KauXX
+52	Cherry Wine
+53	Abacus_Early_Bird
+54	Cherry_wu
+55	Baox
+56	BHWH_Chinese_Fiber_Hemp
+57	Cherry_original
+58	AbacusxBB1
+59	KauXXX
+6	BaoxSP_07
+60	Wife
+61	Berry Blossom
+62	Oregon Melon
+63	BaoxSP_07
+64	Otto_II
+66	C4xBB1
+67	LifterSP_01
+68	BHWH_For_Fiber
+69	Otto
+7	AbacusxBB1
+70	Abacus_Early_Bird_2
+71	GF_BHWH
+72	Chardonnay
+73	KauXXX
+74	Wife
+75	Abacus_Early_Bird
+77	Baox
+78	Cherry_original
+79	LifterSP_01
+8	LifterSP_01
+80	Oregon Melon
+81	BHWH_For_Fiber
+82	BaoxSP_07
+83	Otto_II
+84	GF_BHWH
+85	Cherry Wine
+86	Abacus_Early_Bird_2
+87	C4xBB1
+88	KauXX
+89	AbacusxBB1
+9	BHWH_For_Fiber
+90	Berry Blossom
+91	Chardonnay
+92	Otto
+93	BHWH_Chinese_Fiber_Hemp
+95	Cherry_wu
+96	C4
+97	Abacus_Early_Bird_2
+98	Cherry_original
+99	Abacus_Early_Bird
+106	Chardonnay
+107	AbacusxBB1
+108	BHWH_Chinese_Fiber_Hemp
+109	Berry Blossom
+110	KauXXX
+111	C4
+112	Baox
+114	C4xBB1
+116	LifterSP_01
+117	Otto
+118	BHWH_For_Fiber
+119	Oregon Melon
+120	Cherry Wine
+121	Abacus_Early_Bird
+122	Cherry Wine
+123	Berry Blossom
+124	Chardonnay
+125	LifterSP_01
+126	Wife
+127	BHWH_Chinese_Fiber_Hemp
+129	Cherry_original
+130	KauXX
+131	BaoxSP_07
+132	Otto_II
+133	BHWH_For_Fiber
+135	Cherry_wu
+136	AbacusxBB1
+137	C4
+138	Oregon Melon
+139	Abacus_Early_Bird_2
+140	Baox
+141	C4xBB1
+142	Otto
+143	KauXXX
+145	AbacusxBB1
+147	Cherry_original
+148	BaoxSP_07
+149	Berry Blossom
+150	C4
+151	BHWH_For_Fiber
+152	Chardonnay
+153	KauXX
+154	C4xBB1
+155	Otto_II
+156	KauXXX
+157	Baox
+158	Cherry_wu
+159	Abacus_Early_Bird_2
+160	Otto
+161	BHWH_Chinese_Fiber_Hemp
+162	Oregon Melon
+163	GF_BHWH
+164	LifterSP_01
+165	Abacus_Early_Bird
+166	Cherry Wine
+167	Wife
+169	Abacus_Early_Bird_2
+171	Otto_II
+172	Wife
+173	BaoxSP_07
+174	Cherry Wine
+175	Berry Blossom
+176	Chardonnay
+177	KauXX
+179	Oregon Melon
+180	Abacus_Early_Bird
+181	Baox
+182	Otto
+183	Cherry_wu
+184	KauXXX
+185	Cherry_original
+186	BHWH_Chinese_Fiber_Hemp
+187	AbacusxBB1
+188	LifterSP_01
+189	C4
+190	C4xBB1
+191	BHWH_For_Fiber
