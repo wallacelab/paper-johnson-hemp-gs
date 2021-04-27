@@ -138,37 +138,35 @@ conda activate $conda_hemp
 
 
 
-##############
-# Phylogenetic tree
-##############
-
-# Tree
-$TASSEL5 -vcf 1g_hemp_filtered.sorted.vcf.gz -tree Neighbor -treeSaveDistance false -export 1g_hemp_filtered.sorted.tre -exportType Text
-mv 1g_hemp_filtered.sorted.tre.txt 1g_hemp_filtered.sorted.tre
-
-
-##############
-# Genomic prediction
-##############
-
-# Rename samples to match phenotype info (Tried with 'bcftools reheader', but it did the compression wrong somehow)
-source=1g_hemp_filtered.sorted.vcf.gz
-newfile=1h_hemp_filtered.sorted.renamed.vcf
-zcat $source | grep "^##" > $newfile   # Metadata lines
-zcat $source | grep "^#CHROM" | sed -r "s|1_bams_sorted/P.-HDGS-([0-9]+).aligned.sorted.bam|HDGS_\1|g" >> $newfile  # Header line
-zcat $source | grep -v "^#" >> $newfile   # Genotypes
-gzip $newfile
-
-# Put phenotypes in TASSEL format; also do sqrt and log transformations, just in case
-Rscript $scriptdir/1i_FormatPhenosForTassel.r -i $hplc_results -o 1i_hdgs_phenos --log --sqrt
-
-# Run genomic prediction with TASSEL
-$TASSEL5 -fork1 -vcf 1h_hemp_filtered.sorted.renamed.vcf.gz -ck -fork2 -t 1i_hdgs_phenos.tassel.txt -combine3 -input1 -input2 \
-    -GenomicSelectionPlugin -doCV true -kFolds 10 -nIter 1000 -endPlugin -export 1j_gs_results.txt
-    
-# Graph results as violin plots
-Rscript $scriptdir/1k_PlotPredictionAccuracy.r -i 1j_gs_results.txt -o 1k_gs_results
-
-# Not great, unfortunately
+# ##############
+# # Cladogram
+# ##############
+# 
+# # Tree
+# $TASSEL5 -vcf 1g_hemp_filtered.sorted.vcf.gz -tree Neighbor -treeSaveDistance false -export 1g_hemp_filtered.sorted.tre -exportType Text
+# mv 1g_hemp_filtered.sorted.tre.txt 1g_hemp_filtered.sorted.tre
 
 
+# ##############
+# # Genomic prediction
+# ##############
+# 
+# # Rename samples to match phenotype info (Tried with 'bcftools reheader', but it did the compression wrong somehow)
+# source=1g_hemp_filtered.sorted.vcf.gz
+# newfile=1h_hemp_filtered.sorted.renamed.vcf
+# zcat $source | grep "^##" > $newfile   # Metadata lines
+# zcat $source | grep "^#CHROM" | sed -r "s|1_bams_sorted/P.-HDGS-([0-9]+).aligned.sorted.bam|HDGS_\1|g" >> $newfile  # Header line
+# zcat $source | grep -v "^#" >> $newfile   # Genotypes
+# gzip $newfile
+# 
+# # Put phenotypes in TASSEL format; also do sqrt and log transformations, just in case
+# Rscript $scriptdir/1i_FormatPhenosForTassel.r -i $hplc_results -o 1i_hdgs_phenos --log --sqrt
+# 
+# # Run genomic prediction with TASSEL
+# $TASSEL5 -fork1 -vcf 1h_hemp_filtered.sorted.renamed.vcf.gz -ck -fork2 -t 1i_hdgs_phenos.tassel.txt -combine3 -input1 -input2 \
+#     -GenomicSelectionPlugin -doCV true -kFolds 10 -nIter 1000 -endPlugin -export 1j_gs_results.txt
+#     
+# # Graph results as violin plots
+# Rscript $scriptdir/1k_PlotPredictionAccuracy.r -i 1j_gs_results.txt -o 1k_gs_results
+# 
+# # Not great, unfortunately
