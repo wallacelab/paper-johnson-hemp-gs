@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # This script contains additional analyses requested by reviewers during publication
-# Additional WGS of hemp taken from PRJNA310948, which includes WGS of 55 hemp varieties (Lynch et al 2017; https://doi.org/10.1080/07352689.2016.1265363)
+# Additional WGS of hemp taken from PRJNA310948, which includes WGS of 55 hemp varieties (Lynch et al 2016; https://doi.org/10.1080/07352689.2016.1265363)
 
 TASSEL5="run_pipeline.pl -Xms10g -Xmx40g"
 
@@ -44,8 +44,9 @@ conda activate $conda_hemp
 ####################
 # Neighbor Net instead of neighbor joinging
 ####################
-   
-# Rscript $scritpdir/2b_NieghborNetOfPlants.r --distances $workdir/2a_hemp_distances.txt --keyfile $scriptdir/0_HDGS_keyfile.txt -o $workdir/2b
+
+#Note: This had to be done manually in a different R environment; getting all the dependencies to work properly in Conda was not working
+# Rscript $scriptdir/2b_MakeSplitsTreeFile.r --distances $workdir/2a_hemp_distances.txt --keyfile $scriptdir/0_HDGS_keyfile.txt -o $workdir/2b_hemp_distances.nex
 
 ####################
 # Add additional hemp genotypes to the dendrogram
@@ -103,20 +104,49 @@ conda activate $conda_hemp
 # # Convert to VCF
 # bcftools view $workdir/2d_ncbi.snp_calls.bcf --output-type z > $workdir/2d_ncbi.snp_calls.vcf.gz
 
-# Find common sites between the datasets
-# zcat $genos | grep -v "^##" | cut -f1-5 > $workdir/2e_hdgs_sites.txt
-# zcat $workdir/2d_ncbi.snp_calls.vcf.gz | grep -v "^##" | cut -f1-5 > $workdir/2e_ncbi_sites.txt
-# Rscript $scriptdir/2e_CompareGenoSites.r -a $workdir/2e_hdgs_sites.txt -b  $workdir/2e_ncbi_sites.txt -o  $workdir/2e_shared_sites.txt
 
-# Subset each dataset to shared sites
-# bcftools index $workdir/2d_ncbi.snp_calls.vcf.gz
-# bcftools filter --regions-file $workdir/2e_shared_sites.txt $workdir/2d_ncbi.snp_calls.vcf.gz | bgzip > $workdir/2f_ncbi.shared_snps.vcf.gz
+# # Filter according to the same standards as for the HDGS genos EXCEPT for depth, since so much less
+# # Pre-filter plots
+# $TASSEL5 -SortGenotypeFilePlugin -inputFile $workdir/2d_ncbi.snp_calls.vcf.gz -outputFile $workdir/2d_ncbi.snp_calls.sorted.vcf.gz
+# $TASSEL5 -vcf $workdir/2d_ncbi.snp_calls.sorted.vcf.gz -genotypeSummary site -export $workdir/2d_ncbi.snp_calls.sorted.sitesummary.txt
+# $TASSEL5 -vcf $workdir/2d_ncbi.snp_calls.sorted.vcf.gz -genotypeSummary taxa -export $workdir/2d_ncbi.snp_calls.sorted.taxasummary.txt
+# vcftools --gzvcf $workdir/2d_ncbi.snp_calls.sorted.vcf.gz  --site-depth --stdout > $workdir/2d_ncbi.snp_calls.sorted.depth.txt
+
+# # Plot 
+# Rscript $scriptdir/1c_PlotGenoSummary.r --sitefile  $workdir/2d_ncbi.snp_calls.sorted.sitesummary.txt --taxafile $workdir/2d_ncbi.snp_calls.sorted.taxasummary.txt --depthfile $workdir/2d_ncbi.snp_calls.sorted.depth.txt \
+#     --max-datapoints 10000 -o $workdir/2d_ncbi.snp_calls.sorted.summary_plots.png
+
+# # Filter
+# site_max_het=0.1
+# site_min_maf=0.025
+# site_max_missing=0.2  # Equivalent to 80% present
+# Rscript $scriptdir/1d_GetFilterLists.r --sitefile $workdir/2d_ncbi.snp_calls.sorted.sitesummary.txt --taxafile $workdir/2d_ncbi.snp_calls.sorted.taxasummary.txt  --depthfile $workdir/2d_ncbi.snp_calls.sorted.depth.txt \
+#     --site-max-het $site_max_het --site-min-maf $site_min_maf --site-max-missing $site_max_missing  \
+#     --outtaxa $workdir/2e_ncbi.snp_calls.taxa_to_keep.txt --outsites $workdir/2e_ncbi.snp_calls.sites_to_keep.txt
+
+# # Perform actual filtering
+# bcftools view --targets-file $workdir/2e_ncbi.snp_calls.sites_to_keep.txt --samples-file $workdir/2e_ncbi.snp_calls.taxa_to_keep.txt --output-type z --output-file $workdir/2e_ncbi.snp_calls.filtered.vcf.gz $workdir/2d_ncbi.snp_calls.vcf.gz
+
+
+# # Find common sites between the datasets
+# zcat $genos | grep -v "^##" | cut -f1-5 > $workdir/2f_hdgs_sites.txt
+# zcat $workdir/2e_ncbi.snp_calls.filtered.vcf.gz | grep -v "^##" | cut -f1-5 > $workdir/2f_ncbi_sites.txt
+# Rscript $scriptdir/2f_CompareGenoSites.r -a $workdir/2f_hdgs_sites.txt -b  $workdir/2f_ncbi_sites.txt -o  $workdir/2f_shared_sites.txt
+
+# # Subset each dataset to shared sites
+# bcftools index $workdir/2e_ncbi.snp_calls.filtered.vcf.gz 
+# bcftools filter --regions-file $workdir/2f_shared_sites.txt $workdir/2e_ncbi.snp_calls.filtered.vcf.gz | bgzip > $workdir/2f_ncbi.shared_snps.vcf.gz
 # zcat $genos | bgzip > $workdir/2f_hdgs.all_snps.vcf.gz
 # bcftools index $workdir/2f_hdgs.all_snps.vcf.gz
-# bcftools filter --regions-file $workdir/2e_shared_sites.txt $workdir/2f_hdgs.all_snps.vcf.gz | bgzip > $workdir/2f_hdgs.shared_snps.vcf.gz
+# bcftools filter --regions-file $workdir/2f_shared_sites.txt $workdir/2f_hdgs.all_snps.vcf.gz | bgzip > $workdir/2f_hdgs.shared_snps.vcf.gz
 
 # # Merge; using TASSEL because is more robust that BCFtoools, but does lose a bunch of annotation data
 # $TASSEL5 -fork1 -vcf $workdir/2f_hdgs.shared_snps.vcf.gz  -fork2 -vcf $workdir/2f_ncbi.shared_snps.vcf.gz -combine3 -input1 -input2 -mergeGenotypeTables \
 #     -export $workdir/2g_combined_genos.vcf.gz -exportType VCF
 
-# Stopped here because a quick manual inspection showed that the two datasets were clearly and distinctly separating from each other, likely due to the much lower depth of the NCBI data causing artifacts
+# # Get distance matrix for Splitstree format
+# $TASSEL5 -vcf $workdir/2g_combined_genos.vcf.gz -distanceMatrix -export $workdir/2g_combined_genos.distances.txt
+
+# NOTE: This next step done in a different Conda environment b/c I could not get all the dependencies for RSplitsTree to work properly in time. Sorry.
+# Rscript $scritpdir/2b_NieghborNetOfPlants.r --distances $workdir/2a_hemp_distances.txt --keyfile $scriptdir/0_HDGS_keyfile.txt -o $workdir/2b
+

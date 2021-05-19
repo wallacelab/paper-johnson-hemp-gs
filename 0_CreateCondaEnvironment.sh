@@ -57,7 +57,7 @@ conda create --name $conda_env --file conda_environment.txt
 # conda create -n $conda_env bcftools=1.9 vcftools=0.1.16 tassel=5.2.40 r-base=3.6.2 r-essentials=3.6  r-ggplot2=3.3.0 r-argparse=2.0.1 r-ggpubr=0.4.0 r-broom=0.7.5 r-vegan r-svglite bwa  sra-tools
 
 # conda activate $conda_env
-# conda install scipy
+# conda install scipy r-devtools r-cli r-pkgload
 
 
 # # Export environment for others to load

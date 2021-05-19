@@ -6,6 +6,7 @@
 library(argparse)
 library(RSplitsTree)
 
+
 # Command-line arguments
 options(stringsAsFactors=F)
 parser=ArgumentParser()
@@ -14,8 +15,8 @@ parser$add_argument("-k", "--keyfile", help="Key file relating sample numbers to
 parser$add_argument("-o", "--outfile", help="Output file (nexus format)")
 args=parser$parse_args()
 # setwd('/home/jgwall/Projects/Hemp/HempAnalysis_JasonRedo/2_RevisionAdditions/')
-# args=parser$parse_args(c("-d", "2a_hemp_distances.txt",
-#                         "-k", "../0_Scripts/0_HDGS_keyfile.txt", "-o", "99_tmp.nex"))
+# args=parser$parse_args(c("-d", "2a_hemp_distances.txt", "-k", "../0_Scripts/0_HDGS_keyfile.txt", "-o", "2b_hemp_distances.nex"))
+# args=parser$parse_args(c("-d", "2g_combined_genos.distances.txt", "-k", "../0_Scripts/0_HDGS_keyfile.txt", "-o", "2b_hemp_distances.nex"))
 
 cat("Converting distances to Nexus format\n")
 
