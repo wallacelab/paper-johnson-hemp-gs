@@ -9,5 +9,5 @@ This pipieline uses a Conda environment for reproducibility.  To set up an ident
 
 # Running the analysis
 After setting up your conda enviroment (above), you can run 0_RerunHempGenotyping.sh. The script assumes you have already aligned the FASTQ files to a genome and gotten BAM files out. If you don't want to rerun the entire pipeline from scratch, you can start any of the key intermediate files included in this repo.
-* Raw FASTQ files from the paper: TODO: ADD NCBI ACCESSION
-* Hemp genome we used: https://www.ncbi.nlm.nih.gov/assembly/GCF_900626175.1/
+* FASTQ files from the paper (adaptor-trimmed and restriction-fragment-verified): [NCBI Bioproject PRJNA707556](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJNA707556)
+* Hemp genome: [CBDRx version GCF_900626175.1](https://www.ncbi.nlm.nih.gov/assembly/GCF_900626175.1/)
